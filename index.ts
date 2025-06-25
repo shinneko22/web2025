@@ -9,7 +9,7 @@ const prisma = new PrismaClient({
   log: ['query'],
 });
 
-// Expressアプリケーションのインスタンスを作成するぞい
+// Expressアプリケーションのインスタンスを作成するぞいよ
 const app = express();
 
 // 環境変数が設定されていれば、そこからポート番号を取得するのじゃ。
