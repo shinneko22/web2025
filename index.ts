@@ -1,7 +1,7 @@
 // Expressフレームワークをインポートするのじゃ
 import express from 'express';
 // 生成した Prisma Client をインポートするぞい
-import { PrismaClient } from './generated/prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 // Prisma Client のインスタンスを作成するのじゃ
 const prisma = new PrismaClient({
