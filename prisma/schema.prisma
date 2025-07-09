@@ -22,6 +22,8 @@ model Paper {
   authors   String
   journal   String?
   year      Int?
+  pdfUrl    String?
+  summary   String?
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 }

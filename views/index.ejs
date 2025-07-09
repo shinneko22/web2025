@@ -1,19 +1,24 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>ユーザー一覧</title>
+  <title>論文一覧</title>
 </head>
 <body>
-  <h1>ユーザー一覧</h1>
+  <h1>論文一覧</h1>
   <ul>
-    <% users.forEach(user => { %>
-      <li><%= user.name %></li>
+    <% papers.forEach(paper => { %>
+      <li><strong><%= paper.title %></strong> by <%= paper.authors %> (<%= paper.year %>)</li>
     <% }) %>
   </ul>
-  <h2>ユーザー追加</h2>
-  <form action="/users" method="post">
-    <input type="text" name="name" placeholder="ユーザー名を入力" required>
+
+  <h2>論文追加</h2>
+  <form method="POST" action="/papers">
+    <input name="title" placeholder="タイトル" required />
+    <input name="authors" placeholder="著者" required />
+    <input name="journal" placeholder="ジャーナル" />
+    <input name="year" type="number" placeholder="発表年" />
+    <input name="pdfUrl" placeholder="PDF URL" />
+    <textarea name="summary" placeholder="要約"></textarea>
     <button type="submit">追加</button>
   </form>
 </body>
