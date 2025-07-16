@@ -1,3 +1,4 @@
+// index.ts (No changes needed)
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 
@@ -9,12 +10,16 @@ const app = express();
 const PORT = process.env.PORT || 8888;
 
 app.set('view engine', 'ejs');
-app.set('views', './views');
+app.set('views', './views'); // Ensure this path is correct relative to your app's root
 app.use(express.urlencoded({ extended: true }));
 
 // 論文一覧取得
 app.get('/', async (req, res) => {
-  const papers = await prisma.paper.findMany();
+  const papers = await prisma.paper.findMany({
+    orderBy: {
+      year: 'desc', // Order by year descending for latest papers first
+    },
+  });
   res.render('index', { papers });
 });
 
@@ -26,12 +31,12 @@ app.post('/papers', async (req, res) => {
       title,
       authors,
       journal,
-      year: year ? Number(year) : undefined,
+      year: year ? Number(year) : undefined, // Convert year to number if provided
       pdfUrl,
       summary,
     },
   });
-  res.redirect('/');
+  res.redirect('/'); // Redirect back to the home page to see the updated list
 });
 
 app.listen(PORT, () => {

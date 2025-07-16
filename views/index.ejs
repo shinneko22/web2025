@@ -1,25 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-  <title>論文一覧</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>論文管理システム</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom scrollbar for a nicer look */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  </style>
 </head>
-<body>
-  <h1>論文一覧</h1>
-  <ul>
-    <% papers.forEach(paper => { %>
-      <li><strong><%= paper.title %></strong> by <%= paper.authors %> (<%= paper.year %>)</li>
-    <% }) %>
-  </ul>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal p-6">
 
-  <h2>論文追加</h2>
-  <form method="POST" action="/papers">
-    <input name="title" placeholder="タイトル" required />
-    <input name="authors" placeholder="著者" required />
-    <input name="journal" placeholder="ジャーナル" />
-    <input name="year" type="number" placeholder="発表年" />
-    <input name="pdfUrl" placeholder="PDF URL" />
-    <textarea name="summary" placeholder="要約"></textarea>
-    <button type="submit">追加</button>
-  </form>
+  <div class="container mx-auto bg-white shadow-lg rounded-lg p-8">
+    <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">論文管理システム</h1>
+
+    <div class="mb-12">
+      <h2 class="text-3xl font-semibold text-gray-700 mb-6 border-b-2 pb-2">論文一覧</h2>
+      <% if (papers.length === 0) { %>
+        <p class="text-gray-600 text-lg text-center mt-8">まだ論文がありません。新しい論文を追加しましょう！</p>
+      <% } else { %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <% papers.forEach(paper => { %>
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+              <h3 class="text-xl font-bold text-gray-900 mb-2"><%= paper.title %></h3>
+              <p class="text-gray-700 text-sm mb-1">著者: <span class="font-medium"><%= paper.authors %></span></p>
+              <p class="text-gray-600 text-sm mb-1">発表年: <span class="font-medium"><%= paper.year %></span></p>
+              <% if (paper.journal) { %>
+                <p class="text-gray-600 text-sm mb-1">ジャーナル: <span class="font-medium"><%= paper.journal %></span></p>
+              <% } %>
+              <% if (paper.summary) { %>
+                <p class="text-gray-600 text-sm mt-3 line-clamp-3"><%= paper.summary %></p>
+              <% } %>
+              <% if (paper.pdfUrl) { %>
+                <a href="<%= paper.pdfUrl %>" target="_blank" class="inline-flex items-center text-blue-600 hover:text-blue-800 mt-4 text-sm font-medium">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                  PDFを表示
+                </a>
+              <% } %>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <hr class="my-10 border-gray-300">
+
+    <div>
+      <h2 class="text-3xl font-semibold text-gray-700 mb-6 border-b-2 pb-2">論文追加</h2>
+      <form method="POST" action="/papers" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="col-span-1 md:col-span-2">
+          <label for="title" class="block text-sm font-medium text-gray-700 mb-1">タイトル <span class="text-red-500">*</span></label>
+          <input type="text" id="title" name="title" placeholder="論文のタイトル" required
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div>
+          <label for="authors" class="block text-sm font-medium text-gray-700 mb-1">著者 <span class="text-red-500">*</span></label>
+          <input type="text" id="authors" name="authors" placeholder="著者名 (カンマ区切り)" required
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div>
+          <label for="journal" class="block text-sm font-medium text-gray-700 mb-1">ジャーナル</label>
+          <input type="text" id="journal" name="journal" placeholder="発表ジャーナル名"
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div>
+          <label for="year" class="block text-sm font-medium text-gray-700 mb-1">発表年</label>
+          <input type="number" id="year" name="year" placeholder="例: 2023" min="1900" max="<%= new Date().getFullYear() + 5 %>"
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div>
+          <label for="pdfUrl" class="block text-sm font-medium text-gray-700 mb-1">PDF URL</label>
+          <input type="url" id="pdfUrl" name="pdfUrl" placeholder="論文PDFへのURL"
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div class="col-span-1 md:col-span-2">
+          <label for="summary" class="block text-sm font-medium text-gray-700 mb-1">要約</label>
+          <textarea id="summary" name="summary" rows="4" placeholder="論文の簡単な要約"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+        </div>
+
+        <div class="col-span-1 md:col-span-2 flex justify-end">
+          <button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+            <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            論文を追加
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </body>
 </html>
