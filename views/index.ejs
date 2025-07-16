@@ -20,6 +20,7 @@
     }
     ::-webkit-scrollbar-thumb:hover {
       background: #555;
+      cursor: pointer; /* Add cursor pointer for better UX */
     }
   </style>
 </head>
@@ -35,22 +36,31 @@
       <% } else { %>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <% papers.forEach(paper => { %>
-            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
-              <h3 class="text-xl font-bold text-gray-900 mb-2"><%= paper.title %></h3>
-              <p class="text-gray-700 text-sm mb-1">著者: <span class="font-medium"><%= paper.authors %></span></p>
-              <p class="text-gray-600 text-sm mb-1">発表年: <span class="font-medium"><%= paper.year %></span></p>
-              <% if (paper.journal) { %>
-                <p class="text-gray-600 text-sm mb-1">ジャーナル: <span class="font-medium"><%= paper.journal %></span></p>
-              <% } %>
-              <% if (paper.summary) { %>
-                <p class="text-gray-600 text-sm mt-3 line-clamp-3"><%= paper.summary %></p>
-              <% } %>
-              <% if (paper.pdfUrl) { %>
-                <a href="<%= paper.pdfUrl %>" target="_blank" class="inline-flex items-center text-blue-600 hover:text-blue-800 mt-4 text-sm font-medium">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                  PDFを表示
-                </a>
-              <% } %>
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col justify-between">
+              <div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2"><%= paper.title %></h3>
+                <p class="text-gray-700 text-sm mb-1">著者: <span class="font-medium"><%= paper.authors %></span></p>
+                <p class="text-gray-600 text-sm mb-1">発表年: <span class="font-medium"><%= paper.year %></span></p>
+                <% if (paper.journal) { %>
+                  <p class="text-gray-600 text-sm mb-1">ジャーナル: <span class="font-medium"><%= paper.journal %></span></p>
+                <% } %>
+                <% if (paper.summary) { %>
+                  <p class="text-gray-600 text-sm mt-3 line-clamp-3"><%= paper.summary %></p>
+                <% } %>
+              </div>
+              <div class="mt-4 flex justify-between items-center">
+                <% if (paper.pdfUrl) { %>
+                  <a href="<%= paper.pdfUrl %>" target="_blank" class="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    PDFを表示
+                  </a>
+                <% } %>
+                <button type="button" onclick="deletePaper('<%= paper.id %>', '<%= paper.title %>')"
+                        class="ml-auto inline-flex items-center text-red-600 hover:text-red-800 text-sm font-medium">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  削除
+                </button>
+              </div>
             </div>
           <% }) %>
         </div>
@@ -107,6 +117,34 @@
       </form>
     </div>
   </div>
+
+  <script>
+    async function deletePaper(paperId, paperTitle) {
+      if (confirm(`「${paperTitle}」を本当に削除しますか？`)) {
+        try {
+          const response = await fetch(`/papers/${paperId}/delete`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            // Note: For a simple POST redirect, a body might not be strictly necessary,
+            // but it's good practice for consistency if you were sending data.
+            // For this specific case, we just need the ID in the URL.
+          });
+
+          if (response.ok) {
+            window.location.reload(); // 成功したらページをリロードして更新されたリストを表示
+          } else {
+            alert('論文の削除に失敗しました。');
+            console.error('Failed to delete paper:', response.statusText);
+          }
+        } catch (error) {
+          alert('エラーが発生しました。論文を削除できませんでした。');
+          console.error('Error deleting paper:', error);
+        }
+      }
+    }
+  </script>
 
 </body>
 </html>
